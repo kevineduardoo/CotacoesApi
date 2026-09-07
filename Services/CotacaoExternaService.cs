@@ -18,26 +18,26 @@ public class CotacaoExternaService : ICotacaoExternaService
     {
         try
         {
-            var par = $"{moeda.ToUpper()}-BRL";
-            var url = $"https://economia.awesomeapi.com.br/json/last/{par}";
+            var moedaUpper = moeda.ToUpper();
+            var url = $"https://api.frankfurter.dev/v1/latest?base={moedaUpper}&symbols=BRL";
 
             var response = await _httpClient.GetAsync(url);
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogWarning("API externa retornou {StatusCode} para {Par}", response.StatusCode, par);
+                _logger.LogWarning("API externa retornou {StatusCode} para {Moeda}", response.StatusCode, moedaUpper);
                 return null;
             }
 
             var json = await response.Content.ReadAsStringAsync();
             using var doc = JsonDocument.Parse(json);
 
-            var chave = par.Replace("-", "");
-            var item = doc.RootElement.GetProperty(chave);
+            var rates = doc.RootElement.GetProperty("rates");
+            var valor = rates.GetProperty("BRL").GetDecimal();
 
             return new CotacaoDto
             {
-                Moeda = moeda.ToUpper(),
-                Valor = decimal.Parse(item.GetProperty("bid").GetString()!, System.Globalization.CultureInfo.InvariantCulture),
+                Moeda = moedaUpper,
+                Valor = valor,
                 DataHora = DateTime.UtcNow
             };
         }
