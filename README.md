@@ -1,4 +1,5 @@
 # CotacoesApi
+![CI](https://github.com/kevineduardoo/CotacoesApi/actions/workflows/ci.yml/badge.svg)
 
 API REST em ASP.NET Core que consome uma API externa de câmbio, armazena histórico de cotações e expõe endpoints com cache, persistência e tratamento de erros.
 
@@ -25,12 +26,23 @@ API REST em ASP.NET Core que consome uma API externa de câmbio, armazena histó
 
 ```bash
 git clone https://github.com/kevineduardoo/CotacoesApi.git
-cd CotacoesApi/CotacoesApi
+cd CotacoesApi
 dotnet restore
 dotnet run
 ```
 
 Acesse `http://localhost:5297/swagger` para testar os endpoints.
+
+## Testes
+
+O projeto tem 15 testes automatizados com xUnit, que rodam a cada push e pull request via GitHub Actions.
+
+```bash
+dotnet test CotacoesApi.Tests
+```
+
+- **Serviço da API externa:** usa um `HttpMessageHandler` falso para simular sucesso, erros de status (429, 500, 404) e JSON inválido, sem depender da internet.
+- **Controller:** usa SQLite em memória para testar cache, histórico, filtro por moeda, limite de 50 registros e erro 502.
 
 ## Decisões técnicas
 
@@ -42,7 +54,6 @@ Acesse `http://localhost:5297/swagger` para testar os endpoints.
 ## Próximos passos
 
 - Migrar o SQLite para um banco persistente (ex: PostgreSQL), já que o Railway não mantém o arquivo SQLite entre reinicializações do container.
-- Adicionar testes automatizados.
 - Adicionar autenticação por API key nos endpoints de escrita.
 
 ## Deploy
