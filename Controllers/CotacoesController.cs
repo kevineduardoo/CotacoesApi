@@ -4,6 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using CotacoesApi.Data;
 using CotacoesApi.Models;
 using CotacoesApi.Services;
+using CotacoesApi.Filters;
 
 namespace CotacoesApi.Controllers;
 
@@ -62,7 +63,7 @@ public class CotacoesController : ControllerBase
 
         return Ok(resultado);
     }
-
+    [TypeFilter(typeof(ApiKeyFilter))]
     [HttpPost("atualizar")]
     public async Task<IActionResult> AtualizarManualmente([FromQuery] string moeda = "USD")
     {

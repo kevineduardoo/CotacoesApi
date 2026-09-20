@@ -20,7 +20,24 @@ API REST em ASP.NET Core que consome uma API externa de câmbio, armazena histó
 |--------|------|-----------|
 | GET | `/cotacoes/atual?moeda=USD` | Retorna a cotação atual (cache de 5 min) |
 | GET | `/cotacoes/historico?moeda=USD` | Retorna as últimas 50 cotações salvas |
-| POST | `/cotacoes/atualizar?moeda=USD` | Força atualização, ignorando o cache |
+| POST | `/cotacoes/atualizar?moeda=USD` | Força atualização, ignorando o cache (requer API key) |
+
+## Autenticação
+
+O endpoint `POST /cotacoes/atualizar` exige uma API key no cabeçalho `X-Api-Key`. Sem a chave, ou com uma chave errada, a API responde `401`. Os endpoints `GET` são públicos.
+
+```bash
+curl -X POST "https://cotacoesapi-production-2cf6.up.railway.app/cotacoes/atualizar?moeda=USD" \
+  -H "X-Api-Key: SUA_CHAVE"
+```
+
+Para rodar localmente, configure a chave com user-secrets:
+
+```bash
+dotnet user-secrets set "ApiKey" "sua-chave-local"
+```
+
+Em produção, a chave fica na variável de ambiente `ApiKey` do Railway.
 
 ## Como rodar localmente
 
@@ -35,7 +52,7 @@ Acesse `http://localhost:5297/swagger` para testar os endpoints.
 
 ## Testes
 
-O projeto tem 15 testes automatizados com xUnit, que rodam a cada push e pull request via GitHub Actions.
+O projeto tem 22 testes automatizados com xUnit, que rodam a cada push e pull request via GitHub Actions.
 
 ```bash
 dotnet test CotacoesApi.Tests
@@ -50,11 +67,11 @@ dotnet test CotacoesApi.Tests
 - **Persistência de histórico:** toda cotação buscada é salva no SQLite via EF Core, permitindo consultar dados sem depender da API externa.
 - **Middleware de erro global:** qualquer exceção não tratada retorna um JSON padronizado, sem vazar stack trace.
 - **Troca de API externa:** o projeto inicialmente usava a AwesomeAPI, mas ela apresentou rate limiting (429) persistente em produção. Migrado para a Frankfurter, mais estável para esse tipo de uso.
+- **API key em filtro de ação:** o endpoint de escrita é protegido por um filtro que compara a chave em tempo constante e bloqueia tudo se o servidor estiver sem chave configurada.
 
 ## Próximos passos
 
 - Migrar o SQLite para um banco persistente (ex: PostgreSQL), já que o Railway não mantém o arquivo SQLite entre reinicializações do container.
-- Adicionar autenticação por API key nos endpoints de escrita.
 
 ## Deploy
 
