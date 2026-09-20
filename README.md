@@ -8,7 +8,7 @@ API REST em ASP.NET Core que consome uma API externa de câmbio, armazena histó
 ## Tecnologias
 
 - ASP.NET Core Web API (.NET 10)
-- Entity Framework Core + SQLite
+- Entity Framework Core + PostgreSQL (produção) e SQLite (desenvolvimento local)
 - IMemoryCache
 - Swagger / Swashbuckle
 - Docker (deploy)
@@ -66,14 +66,14 @@ dotnet test CotacoesApi.Tests
 ## Decisões técnicas
 
 - **Cache em memória (5 min):** evita bater na API externa a cada requisição, reduzindo latência e risco de rate limiting.
-- **Persistência de histórico:** toda cotação buscada é salva no SQLite via EF Core, permitindo consultar dados sem depender da API externa.
+- **Persistência de histórico:** toda cotação buscada é salva no banco via EF Core, permitindo consultar dados sem depender da API externa. Em produção usa PostgreSQL no Railway, com volume persistente; localmente usa SQLite.
 - **Middleware de erro global:** qualquer exceção não tratada retorna um JSON padronizado, sem vazar stack trace.
 - **Troca de API externa:** o projeto inicialmente usava a AwesomeAPI, mas ela apresentou rate limiting (429) persistente em produção. Migrado para a Frankfurter, mais estável para esse tipo de uso.
 - **API key em filtro de ação:** o endpoint de escrita é protegido por um filtro que compara a chave em tempo constante e bloqueia tudo se o servidor estiver sem chave configurada.
 
 ## Próximos passos
 
-- Migrar o SQLite para um banco persistente (ex: PostgreSQL), já que o Railway não mantém o arquivo SQLite entre reinicializações do container.
+- Adotar migrations do Entity Framework, com PostgreSQL também no desenvolvimento local.
 
 ## Deploy
 

@@ -26,9 +26,15 @@ builder.Services.AddMemoryCache();
 
 builder.Services.AddHttpClient<ICotacaoExternaService, CotacaoExternaService>();
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=cotacoes.db"));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    if (string.IsNullOrWhiteSpace(connectionString))
+        options.UseSqlite("Data Source=cotacoes.db"); // desenvolvimento local
+    else
+        options.UseNpgsql(connectionString); // produção (Railway)
+});
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
