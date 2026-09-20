@@ -39,6 +39,8 @@ dotnet user-secrets set "ApiKey" "sua-chave-local"
 
 Em produção, a chave fica na variável de ambiente `ApiKey` do Railway.
 
+No Swagger, clique em **Authorize** e informe a chave para testar o endpoint protegido.
+
 ## Como rodar localmente
 
 ```bash
