@@ -26,21 +26,17 @@ builder.Services.AddMemoryCache();
 
 builder.Services.AddHttpClient<ICotacaoExternaService, CotacaoExternaService>();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException(
+        "Configure ConnectionStrings:DefaultConnection (user-secrets ou variável de ambiente).");
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    if (string.IsNullOrWhiteSpace(connectionString))
-        options.UseSqlite("Data Source=cotacoes.db"); // desenvolvimento local
-    else
-        options.UseNpgsql(connectionString); // produção (Railway)
-});
+builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
+    db.Database.Migrate();
 }
 
 app.UseExceptionHandler(errorApp =>
