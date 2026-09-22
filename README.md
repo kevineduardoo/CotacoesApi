@@ -70,10 +70,10 @@ dotnet test CotacoesApi.Tests
 - **Middleware de erro global:** qualquer exceção não tratada retorna um JSON padronizado, sem vazar stack trace.
 - **Troca de API externa:** o projeto inicialmente usava a AwesomeAPI, mas ela apresentou rate limiting (429) persistente em produção. Migrado para a Frankfurter, mais estável para esse tipo de uso.
 - **API key em filtro de ação:** o endpoint de escrita é protegido por um filtro que compara a chave em tempo constante e bloqueia tudo se o servidor estiver sem chave configurada.
+- **Migrations do Entity Framework Core:** o esquema do banco é versionado por migrations, aplicadas com Migrate() na inicialização. O ambiente local também usa PostgreSQL, para o comportamento ficar igual ao de produção.
 
 ## Próximos passos
 
-- Adotar migrations do Entity Framework, com PostgreSQL também no desenvolvimento local.
 
 ## Deploy
 
