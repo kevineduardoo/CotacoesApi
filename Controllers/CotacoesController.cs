@@ -23,7 +23,7 @@ public class CotacoesController : ControllerBase
         _cache = cache;
     }
 
-    [HttpGet("atual")]
+        [HttpGet("atual")]
     public async Task<IActionResult> ObterAtual([FromQuery] string moeda = "USD")
     {
         var cacheKey = $"cotacao_{moeda.ToUpper()}";
@@ -34,14 +34,6 @@ public class CotacoesController : ControllerBase
         var cotacao = await _externaService.ObterCotacaoAtualAsync(moeda);
         if (cotacao is null)
             return StatusCode(502, new { erro = "Não foi possível obter a cotação externa." });
-
-        _db.Cotacoes.Add(new Models.Cotacao
-        {
-            Moeda = cotacao.Moeda,
-            Valor = cotacao.Valor,
-            DataHora = cotacao.DataHora
-        });
-        await _db.SaveChangesAsync();
 
         _cache.Set(cacheKey, cotacao, TimeSpan.FromMinutes(5));
 
