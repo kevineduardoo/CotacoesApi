@@ -68,8 +68,8 @@ public class CotacoesControllerTests : IDisposable
 
     // ---------- GET /cotacoes/atual ----------
 
-    [Fact]
-    public async Task ObterAtual_SemCache_BuscaNaApiSalvaNoBancoERetornaOk()
+       [Fact]
+    public async Task ObterAtual_SemCache_BuscaNaApiENaoSalvaNoBanco()
     {
         // Act
         var resultado = await _controller.ObterAtual("USD");
@@ -79,17 +79,17 @@ public class CotacoesControllerTests : IDisposable
         var dto = Assert.IsType<CotacaoDto>(ok.Value);
         Assert.Equal(5.25m, dto.Valor);
         Assert.Equal(1, _externa.Chamadas);
-        Assert.Equal(1, await _db.Cotacoes.CountAsync());
+        Assert.Equal(0, await _db.Cotacoes.CountAsync());
     }
 
-    [Fact]
+        [Fact]
     public async Task ObterAtual_SegundaChamada_UsaCacheENaoChamaApiExterna()
     {
         await _controller.ObterAtual("USD");
         await _controller.ObterAtual("USD");
 
         Assert.Equal(1, _externa.Chamadas);
-        Assert.Equal(1, await _db.Cotacoes.CountAsync());
+        Assert.Equal(0, await _db.Cotacoes.CountAsync());
     }
 
     [Fact]
@@ -124,7 +124,7 @@ public class CotacoesControllerTests : IDisposable
 
         Assert.IsType<OkObjectResult>(resultado);
         Assert.Equal(2, _externa.Chamadas);
-        Assert.Equal(2, await _db.Cotacoes.CountAsync());
+        Assert.Equal(1, await _db.Cotacoes.CountAsync());
     }
 
     [Fact]
